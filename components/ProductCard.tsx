@@ -29,7 +29,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
           className="w-full h-40 object-cover mb-4 rounded-lg"
         />
         <h3 className="text-lg font-semibold mb-2">{product.productName}</h3>
-        <p className="text-gray-700 mb-2">Quantity: {product.quantity}</p>
         <p className="text-gray-700">Price: ${product.price}</p>
       </div>
       {isLoggedIn ? (
