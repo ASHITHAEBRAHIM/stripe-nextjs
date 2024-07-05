@@ -32,12 +32,15 @@ export default async function Home() {
         {products.map((product) => {
           const productName =
             product.productName as keyof typeof constants.paymentLinks;
-            const productLink = `${constants.paymentLinks[productName]}?client_reference_id=${user?.id}&productId=${product.id}`;
+          const productLink = user
+            ? `${constants.paymentLinks[productName]}?client_reference_id=${user.id}&productId=${product.id}`
+            : "/login"; // Redirect to login if user is not logged in
           return (
             <ProductCard
               key={product.id}
               product={product}
               productLink={productLink}
+              isLoggedIn={!!user}
             />
           );
         })}
