@@ -1,42 +1,46 @@
-'use client'
-import { checkout } from "@/checkout";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import { validateRequest } from "@/lib/validate-request";
+import Link from "next/link";
+import { logout } from "./logout";
+import ProductCard from "@/components/ProductCard";
+import { db } from "@/db";
+import { itemsTable } from "@/db/schema";
+import { constants } from "@/lib/constants";
 
-export default function Home() {
+export default async function Home() {
+  const { user } = await validateRequest();
+  const products = await db.select().from(itemsTable);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24 text-black">
       <h1 className="text-4xl">Buy Your Product</h1>
-      <div className="flex justify-center mt-12">
-        <div>
-          <Image src="/product1.jpg" alt="product1" width={400} height={400} priority />
-          <p className=" text-2xl mt-2">Product 1</p>
-          <Button onClick={(() => {
-            checkout({
-              lineItems: [
-                {
-                  price: "price_1PWBfLSDB9FdCiLxEeQy7Fbc",
-                  quantity: 1
-                }
-              ]
-            })
-          })} className="mt-2">BUY!</Button>
-        </div>
 
-        <div>
-          <Image src="/product2.jpg" alt="product1" width={400} height={400} priority />
-          <p className=" text-2xl mt-2">Product 2</p>
-          <Button onClick={(() => {
-            checkout({
-              lineItems: [
-                {
-                  price: "price_1PWBgPSDB9FdCiLxIAH1dbXh",
-                  quantity: 1
-                }
-              ]
-            })
-          })} className="mt-2">BUY!</Button>
+      {user ? (
+        <div className="flex justify-between gap-4">
+          <p>Welcome {user.username}!</p>
+          <form action={logout}>
+            <button>Sign out</button>
+          </form>
+          <Link href="/orders">View Purchased Products</Link>
         </div>
+      ) : (
+        <>
+          <Link href="/login">Login</Link>
+        </>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {products.map((product) => {
+          const productName =
+            product.productName as keyof typeof constants.paymentLinks;
+            const productLink = `${constants.paymentLinks[productName]}?client_reference_id=${user?.id}&productId=${product.id}`;
+          return (
+            <ProductCard
+              key={product.id}
+              product={product}
+              productLink={productLink}
+            />
+          );
+        })}
       </div>
     </main>
   );
