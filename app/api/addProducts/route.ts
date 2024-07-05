@@ -4,13 +4,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { itemsTable } from "@/db/schema";
 
-export const config = {
-  api: {
-    bodyParser: false, // Disable default body parsing
-  },
-};
-
-export async function POST(req: NextRequest) {
+export default async function handler(req: NextRequest) {
   if (req.method !== "POST") {
     return NextResponse.json({ status: "Failed", error: "Method not allowed" }, { status: 405 });
   }
